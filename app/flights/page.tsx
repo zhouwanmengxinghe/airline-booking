@@ -3,6 +3,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
+import { getTimezoneLabel } from "@/utils/timezone";
 
 interface FlightData {
   _id: string;
@@ -17,6 +18,14 @@ interface FlightData {
   totalSeats: number;
   remainingSeats: number;
   price: number;
+}
+
+function formatDuration(departureUTC: string, arrivalUTC: string): string {
+  const diff = new Date(arrivalUTC).getTime() - new Date(departureUTC).getTime();
+  const hours = Math.floor(diff / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  if (minutes > 0) return `${hours}h ${minutes}m`;
+  return `${hours}h`;
 }
 
 function FlightResults() {
@@ -109,28 +118,44 @@ function FlightResults() {
           {flights.map((f) => (
             <div key={f._id} className="card p-5 hover:shadow-md transition-shadow">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="space-y-2 flex-1">
+                <div className="space-y-3 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-mono bg-primary-50 text-primary-700 px-2 py-0.5 rounded">
                       {f.flightNumber}
                     </span>
                     <span className="text-xs text-gray-400">{f.aircraftType}</span>
                   </div>
-                  <div className="flex items-center gap-4 text-sm">
-                    <div>
-                      <div className="font-semibold text-gray-900">
+
+                  {/* Departure / Duration / Arrival */}
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="text-center">
+                      <div className="font-semibold text-gray-900 text-lg">
                         {f.departureTimeLocal.split(" ")[1] || f.departureTimeLocal}
                       </div>
                       <div className="text-xs text-gray-400">{f.departureAirport}</div>
+                      <div className="text-[10px] text-gray-400">
+                        {getTimezoneLabel(f.departureAirport)}
+                      </div>
                     </div>
-                    <div className="text-gray-300 text-lg">→</div>
-                    <div>
-                      <div className="font-semibold text-gray-900">
+
+                    <div className="flex flex-col items-center text-center min-w-[70px]">
+                      <span className="text-gray-300 text-lg">→</span>
+                      <span className="text-xs font-medium text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
+                        {formatDuration(f.departureTimeUTC, f.arrivalTimeUTC)}
+                      </span>
+                    </div>
+
+                    <div className="text-center">
+                      <div className="font-semibold text-gray-900 text-lg">
                         {f.arrivalTimeLocal.split(" ")[1] || f.arrivalTimeLocal}
                       </div>
                       <div className="text-xs text-gray-400">{f.arrivalAirport}</div>
+                      <div className="text-[10px] text-gray-400">
+                        {getTimezoneLabel(f.arrivalAirport)}
+                      </div>
                     </div>
                   </div>
+
                   <div className="text-xs text-gray-400">
                     {f.departureTimeLocal} — {f.arrivalTimeLocal}
                   </div>

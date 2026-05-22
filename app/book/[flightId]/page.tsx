@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, FormEvent } from "react";
+import { getTimezoneLabel } from "@/utils/timezone";
 
 interface FlightInfo {
   _id: string;
@@ -147,7 +148,7 @@ export default function BookPage() {
           <span className="font-semibold">{flight.arrivalAirport}</span>
         </div>
         <div className="text-sm text-gray-500">
-          Depart: {flight.departureTimeLocal} &middot; Arrive: {flight.arrivalTimeLocal}
+          Depart: {flight.departureTimeLocal} ({getTimezoneLabel(flight.departureAirport)}) &middot; Arrive: {flight.arrivalTimeLocal} ({getTimezoneLabel(flight.arrivalAirport)})
         </div>
         <div className="flex gap-6 text-sm">
           <span className="text-gray-500">

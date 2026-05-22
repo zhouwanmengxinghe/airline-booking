@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
+import { getTimezoneLabel } from "@/utils/timezone";
 
 interface FlightBrief {
   _id: string;
@@ -187,7 +188,7 @@ export default function MyBookingsPage() {
               </div>
 
               <div className="text-xs text-gray-400">
-                {b.flight.departureTimeLocal} — {b.flight.arrivalTimeLocal}
+                {b.flight.departureTimeLocal} ({getTimezoneLabel(b.flight.departureAirport)}) — {b.flight.arrivalTimeLocal} ({getTimezoneLabel(b.flight.arrivalAirport)})
               </div>
 
               <div className="flex gap-6 text-xs text-gray-500">

@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getTimezoneLabel } from "@/utils/timezone";
 
 interface BookingDetail {
   bookingReference: string;
@@ -141,7 +142,7 @@ export default function BookingSuccessPage() {
           <span className="font-semibold">{booking.flight.arrivalAirport}</span>
         </div>
         <div className="text-sm text-gray-500">
-          Depart: {booking.flight.departureTimeLocal} &middot; Arrive: {booking.flight.arrivalTimeLocal}
+          Depart: {booking.flight.departureTimeLocal} ({getTimezoneLabel(booking.flight.departureAirport)}) &middot; Arrive: {booking.flight.arrivalTimeLocal} ({getTimezoneLabel(booking.flight.arrivalAirport)})
         </div>
         <div className="text-sm">
           <span className="text-gray-500">
