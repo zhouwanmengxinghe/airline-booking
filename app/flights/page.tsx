@@ -143,19 +143,31 @@ function FlightResults() {
                     </div>
                     <div className="text-xs text-gray-400">NZD</div>
                   </div>
-                  <div
-                    className={`text-sm font-medium ${
-                      f.remainingSeats < 2 ? "text-red-600" : "text-gray-500"
-                    }`}
-                  >
-                    {f.remainingSeats} seat{f.remainingSeats !== 1 ? "s" : ""} left
-                  </div>
-                  <Link
-                    href={`/book/${f._id}`}
-                    className="btn-primary whitespace-nowrap"
-                  >
-                    Book Now
-                  </Link>
+                  {f.remainingSeats === 0 ? (
+                    <span className="text-sm font-semibold text-red-500 bg-red-50 px-3 py-1 rounded-full">
+                      Sold Out
+                    </span>
+                  ) : (
+                    <div
+                      className={`text-sm font-medium ${
+                        f.remainingSeats < 2 ? "text-red-600" : "text-gray-500"
+                      }`}
+                    >
+                      {f.remainingSeats} seat{f.remainingSeats !== 1 ? "s" : ""} left
+                    </div>
+                  )}
+                  {f.remainingSeats > 0 ? (
+                    <Link
+                      href={`/book/${f._id}`}
+                      className="btn-primary whitespace-nowrap"
+                    >
+                      Book Now
+                    </Link>
+                  ) : (
+                    <span className="btn bg-gray-200 text-gray-400 cursor-not-allowed px-6 py-2.5 text-sm rounded-lg whitespace-nowrap">
+                      Sold Out
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

@@ -41,7 +41,6 @@ export async function GET(request: NextRequest) {
       departureAirport: depUpper,
       arrivalAirport: arrUpper,
       departureTimeUTC: { $gte: startUtc, $lte: endUtc },
-      remainingSeats: { $gt: 0 },
       arrivalTimeUTC: { $gt: now },
     })
       .select("-bookings")

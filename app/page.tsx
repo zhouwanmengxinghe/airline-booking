@@ -34,11 +34,51 @@ const AIRCRAFT = [
 ];
 
 const ROUTES = [
-  { from: "NZNE", to: "YSSY", name: "Sydney Premium", frequency: "Fri / Sun" },
-  { from: "NZNE", to: "NZRO", name: "Rotorua Shuttle", frequency: "Mon–Fri, 2× daily" },
-  { from: "NZNE", to: "NZGB", name: "Great Barrier Island", frequency: "Mon/Wed/Fri & Tue/Thu/Sat" },
-  { from: "NZNE", to: "NZCI", name: "Chatham Islands", frequency: "Tue/Fri & Wed/Sat" },
-  { from: "NZNE", to: "NZTL", name: "Lake Tekapo", frequency: "Mon & Tue" },
+  {
+    name: "Sydney Premium",
+    from: "NZNE",
+    to: "YSSY",
+    outbound: "Fri 10:00 – 12:00",
+    return: "Sun 15:00 – 19:00",
+    price: "$1,200",
+    aircraft: "SyberJet SJ30i",
+  },
+  {
+    name: "Rotorua Shuttle",
+    from: "NZNE",
+    to: "NZRO",
+    outbound: "Mon–Fri 07:00 / 17:00",
+    return: "Mon–Fri 08:15 / 18:15",
+    price: "$150",
+    aircraft: "Cirrus SF50",
+  },
+  {
+    name: "Great Barrier Island",
+    from: "NZNE",
+    to: "NZGB",
+    outbound: "Mon / Wed / Fri 09:00",
+    return: "Tue / Thu / Sat 09:00",
+    price: "$100",
+    aircraft: "Cirrus SF50",
+  },
+  {
+    name: "Chatham Islands",
+    from: "NZNE",
+    to: "NZCI",
+    outbound: "Tue / Fri 10:00",
+    return: "Wed / Sat 10:00",
+    price: "$300",
+    aircraft: "HondaJet Elite",
+  },
+  {
+    name: "Lake Tekapo",
+    from: "NZNE",
+    to: "NZTL",
+    outbound: "Mon 08:00 – 10:00",
+    return: "Tue 09:00 – 11:00",
+    price: "$250",
+    aircraft: "HondaJet Elite",
+  },
 ];
 
 export default function Home() {
@@ -150,18 +190,37 @@ export default function Home() {
       {/* Routes */}
       <section>
         <h2 className="text-2xl font-bold text-center mb-8">Routes</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {ROUTES.map((r) => (
-            <div key={r.name} className="card p-4 flex items-center justify-between">
-              <div>
-                <div className="font-medium text-gray-900">{r.name}</div>
-                <div className="text-sm text-gray-500">
-                  {r.from} → {r.to}
+            <div key={r.name} className="card p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-gray-900">{r.name}</h3>
+                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
+                  {r.aircraft}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-medium text-primary-700">{r.from}</span>
+                <span className="text-gray-300">⇄</span>
+                <span className="font-medium text-primary-700">{r.to}</span>
+                <span className="ml-auto text-sm font-semibold text-gray-900">
+                  {r.price}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-green-50 rounded-lg p-2.5">
+                  <div className="text-green-700 font-medium mb-0.5">
+                    {r.from} → {r.to}
+                  </div>
+                  <div className="text-gray-500">{r.outbound}</div>
+                </div>
+                <div className="bg-blue-50 rounded-lg p-2.5">
+                  <div className="text-blue-700 font-medium mb-0.5">
+                    {r.to} → {r.from}
+                  </div>
+                  <div className="text-gray-500">{r.return}</div>
                 </div>
               </div>
-              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
-                {r.frequency}
-              </span>
             </div>
           ))}
         </div>
