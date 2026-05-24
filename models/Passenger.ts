@@ -1,13 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IPassenger extends Document {
+export interface Passenger extends Document {
   fullName: string;
   email: string;
   phone: string;
   createdAt: Date;
 }
 
-const PassengerSchema = new Schema<IPassenger>(
+const PassengerSchema = new Schema<Passenger>(
   {
     fullName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -20,4 +20,4 @@ const PassengerSchema = new Schema<IPassenger>(
 );
 
 export default mongoose.models.Passenger ||
-  mongoose.model<IPassenger>("Passenger", PassengerSchema);
+  mongoose.model<Passenger>("Passenger", PassengerSchema);

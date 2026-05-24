@@ -4,11 +4,9 @@ const AIRPORTS = ["NZNE", "YSSY", "NZRO", "NZGB", "NZCI", "NZTL"] as const;
 const AIRCRAFT_TYPES = ["SyberJet SJ30i", "Cirrus SF50", "HondaJet Elite"] as const;
 const BOOKING_STATUSES = ["confirmed", "cancelled"] as const;
 
-// ---------------------------------------------------------------------------
 // Embedded booking sub-document
-// ---------------------------------------------------------------------------
 
-export interface IBookingEmbedded {
+export interface BookingEmbedded {
   _id?: Types.ObjectId;
   bookingReference: string;
   passengerId: Types.ObjectId;
@@ -16,7 +14,7 @@ export interface IBookingEmbedded {
   createdAt: Date;
 }
 
-const BookingEmbeddedSchema = new Schema<IBookingEmbedded>(
+const BookingEmbeddedSchema = new Schema<BookingEmbedded>(
   {
     bookingReference: {
       type: String,
@@ -39,11 +37,9 @@ const BookingEmbeddedSchema = new Schema<IBookingEmbedded>(
   { _id: true }
 );
 
-// ---------------------------------------------------------------------------
-// Schedule (parent) document
-// ---------------------------------------------------------------------------
+// Schedule document
 
-export interface ISchedule extends Document {
+export interface Schedule extends Document {
   flightNumber: string;
   departureAirport: (typeof AIRPORTS)[number];
   arrivalAirport: (typeof AIRPORTS)[number];
@@ -53,12 +49,12 @@ export interface ISchedule extends Document {
   totalSeats: number;
   remainingSeats: number;
   price: number;
-  bookings: IBookingEmbedded[];
+  bookings: BookingEmbedded[];
   createdAt: Date;
   updatedAt: Date;
 }
 
-const ScheduleSchema = new Schema<ISchedule>(
+const ScheduleSchema = new Schema<Schedule>(
   {
     flightNumber: { type: String, required: true, unique: true },
     departureAirport: {
@@ -87,7 +83,7 @@ const ScheduleSchema = new Schema<ISchedule>(
       type: [BookingEmbeddedSchema],
       default: [],
       validate: {
-        validator: function (this: ISchedule, arr: IBookingEmbedded[]) {
+        validator: function (this: Schedule, arr: BookingEmbedded[]) {
           if (arr.length > this.totalSeats) return false;
           const refs = arr.map((b) => b.bookingReference);
           return new Set(refs).size === refs.length;
@@ -103,4 +99,4 @@ const ScheduleSchema = new Schema<ISchedule>(
 );
 
 export default mongoose.models.Schedule ||
-  mongoose.model<ISchedule>("Schedule", ScheduleSchema);
+  mongoose.model<Schedule>("Schedule", ScheduleSchema);
