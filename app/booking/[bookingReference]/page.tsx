@@ -37,6 +37,9 @@ export default function BookingSuccessPage() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
 
+
+  const [cancelling, setCancelling] = useState(false);
+
   useEffect(() => {
     async function load() {
       try {
@@ -60,6 +63,35 @@ export default function BookingSuccessPage() {
     navigator.clipboard.writeText(bookingReference);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+
+  async function handleCancel() {
+    if (!confirm("Are you sure you want to cancel this booking? This cannot be undone.")) {
+      return;
+    }
+
+    setCancelling(true);
+    try {
+      const res = await fetch(`/api/bookings/${bookingReference}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Cancel failed");
+        return;
+      }
+
+  
+      const refreshRes = await fetch(`/api/bookings/${bookingReference}`);
+      const refreshed = await refreshRes.json();
+      setBooking(refreshed);
+    } catch {
+      alert("Network error while cancelling");
+    } finally {
+      setCancelling(false);
+    }
   }
 
   if (loading) {
@@ -151,7 +183,6 @@ export default function BookingSuccessPage() {
         </div>
       </div>
 
-      {/* Actions */}
       <div className="flex gap-3 justify-center">
         <Link href="/my-bookings" className="btn-secondary">
           View My Bookings
@@ -159,6 +190,17 @@ export default function BookingSuccessPage() {
         <Link href="/" className="btn-primary">
           Book Another Flight
         </Link>
+
+        {/* Cancel Booking Button */}
+        {booking.status === "confirmed" && (
+          <button
+            onClick={handleCancel}
+            disabled={cancelling}
+            className="btn-danger"
+          >
+            {cancelling ? "Cancelling..." : "Cancel Booking"}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation"; 
 import { getTimezoneLabel } from "@/utils/timezone";
 
 interface FlightBrief {
@@ -30,6 +31,8 @@ interface BookingItem {
 }
 
 export default function MyBookingsPage() {
+  const router = useRouter(); 
+
   const [email, setEmail] = useState("");
   const [bookings, setBookings] = useState<BookingItem[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,6 +41,9 @@ export default function MyBookingsPage() {
 
   const [cancelTarget, setCancelTarget] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+
+  const [refQuery, setRefQuery] = useState("");
+  const [refLoading, setRefLoading] = useState(false);
 
   async function handleSearch(e: FormEvent) {
     e.preventDefault();
@@ -64,6 +70,32 @@ export default function MyBookingsPage() {
     }
   }
 
+ 
+  async function handleRefSearch(e: FormEvent) {
+    e.preventDefault();
+    const ref = refQuery.trim().toUpperCase();
+    if (!ref) return;
+
+    setRefLoading(true);
+    setError("");
+
+    try {
+     // first check if booking exists
+      const res = await fetch(`/api/bookings/${ref}`);
+      if (!res.ok) {
+        setError("Booking not found or invalid reference.");
+        return;
+      }
+
+      
+      router.push(`/booking/${ref}`);
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setRefLoading(false);
+    }
+  }
+
   async function handleCancel(bookingReference: string) {
     setCancelling(true);
     try {
@@ -74,7 +106,6 @@ export default function MyBookingsPage() {
         return;
       }
 
-      // Update local state
       setBookings((prev) =>
         prev
           ? prev.map((b) =>
@@ -94,10 +125,30 @@ export default function MyBookingsPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold">My Bookings</h1>
 
-      {/* Search form */}
+      {/* Reference Search Form */}
+      <form onSubmit={handleRefSearch} className="card p-5 space-y-3">
+        <label className="block text-sm font-medium text-gray-700">
+          Search by Booking Reference
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={refQuery}
+            onChange={(e) => setRefQuery(e.target.value)}
+            className="input-field flex-1"
+            placeholder="e.g. 44AC7665"
+            required
+          />
+          <button type="submit" disabled={refLoading} className="btn-primary">
+            {refLoading ? "Searching..." : "Search"}
+          </button>
+        </div>
+      </form>
+
+      {/*email search form*/}
       <form onSubmit={handleSearch} className="card p-5 space-y-3">
         <label htmlFor="searchEmail" className="block text-sm font-medium text-gray-700">
-          Enter your email to find your bookings
+          Or find bookings by email
         </label>
         <div className="flex gap-2">
           <input
@@ -115,7 +166,6 @@ export default function MyBookingsPage() {
         </div>
       </form>
 
-      {/* Loading */}
       {loading && (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-500 border-t-transparent mx-auto mb-3" />
@@ -123,14 +173,12 @@ export default function MyBookingsPage() {
         </div>
       )}
 
-      {/* Error */}
       {error && !loading && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-4">
           {error}
         </div>
       )}
 
-      {/* Empty */}
       {searched && !loading && !error && bookings && bookings.length === 0 && (
         <div className="card p-12 text-center space-y-3">
           <p className="text-3xl">&#9993;</p>
@@ -141,7 +189,6 @@ export default function MyBookingsPage() {
         </div>
       )}
 
-      {/* Booking list */}
       {bookings && bookings.length > 0 && (
         <div className="space-y-4">
           <p className="text-sm text-gray-500">
@@ -207,7 +254,6 @@ export default function MyBookingsPage() {
         </div>
       )}
 
-      {/* Cancel confirmation dialog */}
       {cancelTarget && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-xl space-y-4">

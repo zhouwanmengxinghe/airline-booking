@@ -11,7 +11,7 @@ function generateBookingReference(): string {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// ── POST /api/bookings ──────────────────────────────────────────────────────
+// POST /api/bookings 
 
 export async function POST(request: NextRequest) {
   try {
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ── GET /api/bookings?email=xxx ─────────────────────────────────────────────
+//  GET /api/bookings?email=xxx 
 
 export async function GET(request: NextRequest) {
   try {

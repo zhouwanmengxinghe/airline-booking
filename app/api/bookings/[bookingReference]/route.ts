@@ -4,8 +4,7 @@ import Schedule from "@/models/Schedule";
 import Passenger from "@/models/Passenger";
 import { formatLocalTime } from "@/utils/timezone";
 
-// ── GET /api/bookings/:bookingReference ─────────────────────────────────────
-
+//  GET /api/bookings/:bookingReference 
 export async function GET(
   _request: NextRequest,
   { params }: { params: { bookingReference: string } }
@@ -69,7 +68,7 @@ export async function GET(
   }
 }
 
-// ── DELETE /api/bookings/:bookingReference ──────────────────────────────────
+//  DELETE /api/bookings/:bookingReference 
 
 export async function DELETE(
   _request: NextRequest,

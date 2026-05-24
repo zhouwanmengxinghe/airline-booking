@@ -16,26 +16,20 @@ const AIRCRAFT = [
   {
     type: "SyberJet SJ30i",
     seats: 6,
-    desc: "Luxury light jet for trans-Tasman routes",
-    speed: "830 km/h",
   },
   {
     type: "Cirrus SF50",
     seats: 4,
-    desc: "Vision Jet for regional shuttle services",
-    speed: "560 km/h",
   },
   {
     type: "HondaJet Elite",
     seats: 5,
-    desc: "Advanced light jet with best-in-class efficiency",
-    speed: "782 km/h",
   },
 ];
 
 const ROUTES = [
   {
-    name: "Sydney Premium",
+    name: "Sydney air line",
     from: "NZNE",
     to: "YSSY",
     outbound: "Fri 10:00 – 12:00",
@@ -44,7 +38,7 @@ const ROUTES = [
     aircraft: "SyberJet SJ30i",
   },
   {
-    name: "Rotorua Shuttle",
+    name: "Rotorua air line",
     from: "NZNE",
     to: "NZRO",
     outbound: "Mon–Fri 07:00 / 17:00",
@@ -53,7 +47,7 @@ const ROUTES = [
     aircraft: "Cirrus SF50",
   },
   {
-    name: "Great Barrier Island",
+    name: "Great Barrier Island air line",
     from: "NZNE",
     to: "NZGB",
     outbound: "Mon / Wed / Fri 09:00",
@@ -62,7 +56,7 @@ const ROUTES = [
     aircraft: "Cirrus SF50",
   },
   {
-    name: "Chatham Islands",
+    name: "Chatham Islands air line",
     from: "NZNE",
     to: "NZCI",
     outbound: "Tue / Fri 10:00",
@@ -71,7 +65,7 @@ const ROUTES = [
     aircraft: "HondaJet Elite",
   },
   {
-    name: "Lake Tekapo",
+    name: "Lake Tekapo air line",
     from: "NZNE",
     to: "NZTL",
     outbound: "Mon 08:00 – 10:00",
@@ -100,7 +94,7 @@ export default function Home() {
 
   return (
     <div className="space-y-16">
-      {/* Hero */}
+
       <section className="text-center space-y-4">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
           KiwiAir
@@ -177,10 +171,8 @@ export default function Home() {
             <div key={a.type} className="card p-6 text-center space-y-2">
               <span className="text-3xl">✈</span>
               <h3 className="font-semibold text-gray-900">{a.type}</h3>
-              <p className="text-sm text-gray-500">{a.desc}</p>
               <div className="flex justify-center gap-4 text-xs text-gray-400">
                 <span>{a.seats} seats</span>
-                <span>{a.speed}</span>
               </div>
             </div>
           ))}

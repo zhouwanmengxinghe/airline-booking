@@ -7,23 +7,20 @@ import { fromZonedTime } from "date-fns-tz";
 import { addDays, format, getDay } from "date-fns";
 import Schedule from "../models/Schedule";
 
-// ---------------------------------------------------------------------------
-// Route definitions — one entry per directional leg
-// ---------------------------------------------------------------------------
-
+// Route definitions one entry per directional leg
 interface RouteDefinition {
   departure: string;
   arrival: string;
-  departLocalTime: string; // "HH:mm" in departure airport local time
-  arriveLocalTime: string; // "HH:mm" in arrival airport local time
+  departLocalTime: string; //  in departure airport local time
+  arriveLocalTime: string; //  in arrival airport local time
   aircraftType: string;
   totalSeats: number;
   price: number;
-  daysOfWeek: number[]; // 0=Sun, 1=Mon … 6=Sat
+  daysOfWeek: number[]; // 0=Sun, 1=Mon...
 }
 
 const ROUTES: RouteDefinition[] = [
-  // ---- 1. Sydney Premium (SyberJet SJ30i, 6 seats, $1200) ----
+  //  1. Sydney (SyberJet SJ30i, 6 seats, $1200)
   {
     departure: "NZNE",
     arrival: "YSSY",
@@ -45,7 +42,7 @@ const ROUTES: RouteDefinition[] = [
     daysOfWeek: [0], // Sunday only
   },
 
-  // ---- 2. Rotorua Shuttle (Cirrus SF50, 4 seats, $150) ----
+  // 2. Rotorua Shuttle (Cirrus SF50, 4 seats, $150)
   {
     departure: "NZNE",
     arrival: "NZRO",
@@ -74,7 +71,7 @@ const ROUTES: RouteDefinition[] = [
     aircraftType: "Cirrus SF50",
     totalSeats: 4,
     price: 150,
-    daysOfWeek: [1, 2, 3, 4, 5], // Mon–Fri evening outbound
+    daysOfWeek: [1, 2, 3, 4, 5], // Mon–Fri late afternoon outbound
   },
   {
     departure: "NZRO",
@@ -87,7 +84,7 @@ const ROUTES: RouteDefinition[] = [
     daysOfWeek: [1, 2, 3, 4, 5], // Mon–Fri evening return
   },
 
-  // ---- 3. Great Barrier Island (Cirrus SF50, 4 seats, $100) ----
+  // 3. Great Barrier Island (Cirrus SF50, 4 seats, $100) 
   {
     departure: "NZNE",
     arrival: "NZGB",
@@ -109,7 +106,7 @@ const ROUTES: RouteDefinition[] = [
     daysOfWeek: [2, 4, 6], // Tue, Thu, Sat
   },
 
-  // ---- 4. Chatham Islands (HondaJet Elite, 5 seats, $300) ----
+  //4. Chatham Islands (HondaJet Elite, 5 seats, $300)
   {
     departure: "NZNE",
     arrival: "NZCI",
@@ -131,7 +128,7 @@ const ROUTES: RouteDefinition[] = [
     daysOfWeek: [3, 6], // Wed, Sat
   },
 
-  // ---- 5. Lake Tekapo (HondaJet Elite, 5 seats, $250) ----
+  //5. Lake Tekapo (HondaJet Elite, 5 seats, $250)
   {
     departure: "NZNE",
     arrival: "NZTL",
@@ -154,10 +151,7 @@ const ROUTES: RouteDefinition[] = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
+// convert time
 function localToUtc(dateStr: string, timeStr: string, airportCode: string): Date {
   const timezone = getTimezone(airportCode);
   return fromZonedTime(`${dateStr} ${timeStr}:00`, timezone);
@@ -168,7 +162,7 @@ interface RawSchedule {
   arrivalAirport: string;
   departureTimeUTC: Date;
   arrivalTimeUTC: Date;
-  localDepartureDate: string; // yyyy-MM-dd
+  localDepartureDate: string; 
   aircraftType: string;
   totalSeats: number;
   price: number;
@@ -187,25 +181,19 @@ interface ScheduleDoc {
   bookings: [];
 }
 
-// ---------------------------------------------------------------------------
-// Main
-// ---------------------------------------------------------------------------
-
 async function main() {
-  console.log("=== Schedule Data Generator ===\n");
-
   // 1. Connect
-  console.log("[1/5] Connecting to MongoDB...");
+  console.log(" Connecting to MongoDB");
   await connectDB();
   console.log("  OK\n");
 
-  // 2. Clear existing schedules (keep Passengers intact)
-  console.log("[2/5] Clearing existing Schedule collection...");
+  // 2. Clear existing schedules
+  console.log(" Clearing existing Schedule collection");
   const deleteResult = await Schedule.deleteMany({});
   console.log(`  Deleted ${deleteResult.deletedCount} existing schedule(s)\n`);
 
-  // 3. Generate raw schedules for the next 90 days
-  console.log("[3/5] Generating schedules for the next 90 days...\n");
+  // 3. Generate raw schedules
+  console.log(" Generating schedules for the next 90 days\n");
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -227,7 +215,6 @@ async function main() {
       const departUtc = localToUtc(dateStr, route.departLocalTime, route.departure);
       const arriveUtc = localToUtc(dateStr, route.arriveLocalTime, route.arrival);
 
-      // When arrival UTC <= departure UTC, the flight crosses a UTC midnight boundary
       if (arriveUtc <= departUtc) {
         arriveUtc.setUTCDate(arriveUtc.getUTCDate() + 1);
       }
@@ -247,15 +234,13 @@ async function main() {
       totalLegs++;
     }
 
-    if (dayCount > 0) {
-      console.log(`    ${dateStr} (${dayNames[dayOfWeek]}) → ${dayCount} schedule(s)`);
-    }
+    
   }
 
   console.log(`\n  Total raw schedules: ${totalLegs}\n`);
 
   // 4. Assign unique flight numbers
-  console.log("[4/5] Assigning flight numbers...\n");
+  console.log(" Assigning flight numbers...\n");
 
   // Group by (departure, arrival, localDepartureDate) to detect duplicates
   const groups = new Map<string, RawSchedule[]>();
@@ -300,48 +285,16 @@ async function main() {
     }
   });
 
-  // Print sample flight numbers
-  const samples = new Map<string, string[]>();
-  for (const s of toInsert) {
-    const prefix = s.flightNumber.replace(/-\d+$/, "");
-    if (!samples.has(prefix)) samples.set(prefix, []);
-    if (samples.get(prefix)!.length < 3) {
-      samples.get(prefix)!.push(s.flightNumber);
-    }
-  }
 
-  console.log("  Sample flight numbers:");
-  samples.forEach((numbers, prefix) => {
-    console.log(`    ${prefix}* → ${numbers.join(", ")}`);
-  });
-  console.log();
 
   // 5. Insert
-  console.log("[5/5] Inserting schedules into database...");
+  console.log("Inserting schedules into database");
   const inserted = await Schedule.insertMany(toInsert);
   console.log(`  Inserted ${inserted.length} schedule(s)\n`);
 
   // Summary
-  console.log("=== Generation Complete ===\n");
-  console.log("Summary by route:");
+  console.log("Generation Complete \n");
 
-  const routeSummary = new Map<
-    string,
-    { count: number; aircraftType: string; price: number }
-  >();
-  for (const s of toInsert) {
-    const key = `${s.departureAirport}→${s.arrivalAirport}`;
-    if (!routeSummary.has(key)) {
-      routeSummary.set(key, { count: 0, aircraftType: s.aircraftType, price: s.price });
-    }
-    routeSummary.get(key)!.count++;
-  }
-
-  routeSummary.forEach((info, key) => {
-    console.log(`  ${key}: ${info.count} schedules | ${info.aircraftType} | $${info.price} NZD`);
-  });
-
-  console.log(`\nTotal: ${toInsert.length} schedules\n`);
   process.exit(0);
 }
 
