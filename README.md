@@ -8,7 +8,7 @@ Open the terminal in the project root folder and run:
 
 ```bash
 npm install
-
+npm run db:generate
 npm run dev
 # or
 pnpm dev
