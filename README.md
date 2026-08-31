@@ -1,3 +1,5 @@
+English | [简体中文](README.zh-CN.md)
+
 Airline Online Booking System - Assignment 2
 
 ## Getting Started
